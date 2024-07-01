@@ -6,9 +6,11 @@
  * @file dx_commands.hpp
  * @version 1.0
  * @date 12/03/2024
- * @brief Short description
+ * @brief Commands Queue Manager 
  *
- * Longer description
+ * This file contains commands manager 
+ * class declaration 
+ * 
  */
 
 #pragma once
@@ -49,6 +51,4 @@ private:
 };
 
 }
-
-
 

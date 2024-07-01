@@ -6,24 +6,28 @@
  * @file dx_graphics.cpp
  * @version 1.0
  * @date 25/02/2024
- * @brief Short description
+ * @brief Main Dx12 graphics 
  *
- * Longer description
+ * Main Dx12 graphics class methods definitions 
+ * 
  */
-
-#ifdef IMGUI
-#include "IMGUI/imgui.h"
-#include "IMGUI/backends/imgui_impl_dx12.h"
-//#include "IMGUI/imgui_internal.h"
-#endif
 
 #include "dx_graphics_core.hpp"
 #include "config/config.hpp"
+
 namespace reveal3d::graphics {
 
 using namespace render;
 using namespace dx12;
 
+/**
+ * @brief Dx12::Dx12
+ * 
+ * Dx12 rendering class constructor
+ * 
+ * @param[in] res  window resolution
+ * 
+ */
 Dx12::Dx12(window::Resolution *res) :
     resolution_(res), presentInfo_(0),
     swapChainFlags_(DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH)
@@ -31,36 +35,61 @@ Dx12::Dx12(window::Resolution *res) :
 
 }
 
+/**
+ * @brief Dx12::LoadPipeline
+ * 
+ * Initializes the rendering pipeline 
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::LoadPipeline() {
+    // Device and Commands initialization
     InitDXGIAdapter();
     cmdManager_.Init(device_.Get());
+
+    // Descriptors heaps initialization
     heaps_.rtv.Initialize(device_.Get(), dx12::frameBufferCount, false);
     heaps_.srv.Initialize(device_.Get(), 1U, true);
     heaps_.dsv.Initialize(device_.Get(), 1U, false);
-    renderElements_.reserve(4092U);
     dsHandle_ = heaps_.dsv.alloc();
+
+    // Buffers initialization
     CreateSwapChain();
     InitFrameResources();
     InitDsBuffer();
     InitConstantBuffers();
     SetViewport();
+
+    // Building layers
+    renderElements_.reserve(4092U);
     renderLayers_.BuildRoots(device_.Get());
     renderLayers_.BuildPSOs(device_.Get());
-
 }
 
-// TODO: search for first avaible hardware adapter and look for best performance adapter (GPU)
+// TODO: 
 // TODO: check for more features
+
+/**
+ * @brief Dx12::InitDXGIAdapter
+ * 
+ * Searchs for first avaible hardware adapter and look for best performance adapter (GPU) 
+ * It also enables debug layers in DEBUG compilations
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::InitDXGIAdapter() {
     u32 factoryFlags = 0;
     BOOL allowTearing = FALSE;
+    ComPtr<IDXGIAdapter1> hardwareAdapter;
 
 #ifdef _DEBUG
     utl::EnableCpuLayer(factoryFlags);
     utl::LogAdapters();
     utl::EnableGpuLayer();
 #endif
-    ComPtr<IDXGIAdapter1> hardwareAdapter;
+
     CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(&factory_)) >> utl::DxCheck;
     utl::GetHardwareAdapter(factory_.Get(), &hardwareAdapter);
     D3D12CreateDevice(hardwareAdapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device_)) >> utl::DxCheck;
@@ -76,9 +105,16 @@ void Dx12::InitDXGIAdapter() {
 #endif
 }
 
+/**
+ * @brief Dx12::CreateSwapChain
+ * 
+ * Creates the swapchain object
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::CreateSwapChain() {
     ComPtr<IDXGISwapChain1> swapChain1;
-
     const DXGI_SWAP_CHAIN_DESC1 swapChainDesc{
             .Width = resolution_->width,
             .Height = resolution_->height,
@@ -92,11 +128,21 @@ void Dx12::CreateSwapChain() {
             .AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED,
             .Flags = swapChainFlags_
     };
+
     factory_->CreateSwapChainForHwnd(cmdManager_.GetQueue(), window_.hwnd, &swapChainDesc, nullptr, nullptr, &swapChain1) >> utl::DxCheck;
     factory_->MakeWindowAssociation(window_.hwnd, DXGI_MWA_NO_ALT_ENTER) >> utl::DxCheck; // Disable Alt + Enter for full screen window
     swapChain1.As(&swapChain_) >> utl::DxCheck;
 }
 
+/**
+ * @brief Dx12::CreateSwapChain
+ * 
+ * Initializes the frame resources. 
+ * Reveal3D supports triple frame buffering 
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::InitFrameResources() {
     for(u32 i = 0; i < frameBufferCount; ++i) {
         D3D12_RENDER_TARGET_VIEW_DESC desc = {
@@ -111,6 +157,16 @@ void Dx12::InitFrameResources() {
     }
 }
 
+/**
+ * @brief Dx12::InitConstantBuffers
+ * 
+ * Initializes constant buffers for world and pass data
+ * 
+ * @note Buffers must be replicated for each frame resource
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::InitConstantBuffers() {
     for(auto& frameResource : frameResources_) {
         frameResource.constantBuffer.Init(device_.Get(), 65536U); //TODO: hardcoded capacity 256 maximum?
@@ -119,6 +175,17 @@ void Dx12::InitConstantBuffers() {
     }
 }
 
+/**
+ * @brief Dx12::InitDSBuffer
+ * 
+ * Initializes depth and stencil buffers
+ * 
+ * @note Depth and stencil buffers are allocated in the same buffer 24-8 bits for each
+ *  
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::InitDsBuffer() {
     const D3D12_RESOURCE_DESC depthStencilDesc = {
             .Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
@@ -166,6 +233,14 @@ void Dx12::InitDsBuffer() {
     device_->CreateDepthStencilView(depthStencilBuffer_.Get(), &dsvDesc, dsHandle_.cpu);
 }
 
+/**
+ * @brief Dx12::SetViewport
+ * 
+ * Defines the viewport 
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::SetViewport() {
     DXGI_SWAP_CHAIN_DESC desc {};
 
@@ -179,6 +254,14 @@ void Dx12::SetViewport() {
     scissorRect_ = { 0, 0, (i32) desc.BufferDesc.Width, (i32) desc.BufferDesc.Height };
 }
 
+/**
+ * @brief Dx12::LoadAssets
+ * 
+ * Load multiple assets into GPU memory
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::LoadAssets() {
     cmdManager_.Reset(nullptr);
 
@@ -200,6 +283,16 @@ void Dx12::LoadAssets() {
 
 }
 
+/**
+ * @brief Dx12::LoadAsset
+ * 
+ * Load a single asset into GPU memory from scene
+ * 
+ * @param[in] id Entity id 
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::LoadAsset(u32 id) {
     cmdManager_.Reset(nullptr);
     CreateRenderElement(id);
@@ -208,6 +301,16 @@ void Dx12::LoadAsset(u32 id) {
     cmdManager_.WaitForGPU();
 }
 
+/**
+ * @brief Dx12::Update
+ * 
+ * Update info from CPU to GPU like transforms and global scene info 
+ * 
+ * @param[in] camera Reference to the current rendering camera  
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::Update(render::Camera &camera) {
     auto &currFrameRes = frameResources_[Commands::FrameIndex()];
     AlignedConstant<PassConstant, 2> passConstant;
@@ -218,6 +321,7 @@ void Dx12::Update(render::Camera &camera) {
     auto &geometries = core::scene.Geometries();
     std::set<id_t>& dirties = core::scene.DirtyTransforms();
 
+    // Updloads all transforms that has been modified to gpu
     AlignedConstant<ObjConstant, 1> objConstant;
     for (auto id : dirties) {
         objConstant.data.flatColor = geometries.at(id::index(id)).Color();
@@ -225,51 +329,68 @@ void Dx12::Update(render::Camera &camera) {
 
         objConstant.data.worldViewProj = trans.World();
         trans.UnDirty();
+        // NOTE: this could be optimized some how with less calls, making one big copy?? 
         currFrameRes.constantBuffer.CopyData(id::index(id), &objConstant);
     }
 
+    // Uploads all new geometry  
     for (u32 i = 0; i < core::scene.NumEntities(); ++i) {
         if (!geometries[i].OnGpu())
             LoadAsset(i);
     }
 }
 
+/**
+ * @brief Dx12::PrepareRender
+ * 
+ * Makes all the records to render a frame 
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::PrepareRender() {
 
+    //Resets commands list and current frame allocator
     auto &currFrameRes = frameResources_[Commands::FrameIndex()];
     ID3D12GraphicsCommandList* commandList = cmdManager_.List();
-    cmdManager_.Reset(renderLayers_[render::Shader::opaque].pso.Get()); //Resets commands list and current frame allocator
+    cmdManager_.Reset(renderLayers_[render::Shader::opaque].pso.Get()); 
 
-//    cmdManager_.Reset(renderLayers_[render::Shader::opaque].pso.Get()); //Resets commands list and current frame allocator
-    CleanDeferredResources(heaps_); // Clean deferreds resources
+    // Clean deferreds resources that has been deleted in previous frames
+    CleanDeferredResources(heaps_); 
 
+    // Reset surface
     commandList->RSSetViewports(1, &viewport_);
     commandList->RSSetScissorRects(1, &scissorRect_);
 
+    // Barrier transition Present -> RenderTarget
     auto targetBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currFrameRes.backBuffer.Get(), D3D12_RESOURCE_STATE_PRESENT,
             D3D12_RESOURCE_STATE_RENDER_TARGET);
     commandList->ResourceBarrier(1, &targetBarrier);
 
+    // Clear back and depth/stencil buffers 
     const f32 clearColor[] = { config::clearColor.x, config::clearColor.y, config::clearColor.z, config::clearColor.w };
     commandList->ClearRenderTargetView(currFrameRes.backBufferHandle.cpu, clearColor, 0, nullptr);
     commandList->ClearDepthStencilView(dsHandle_.cpu, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
+    // Draws opaque layer
+    ID3D12DescriptorHeap* srvDesc = heaps_.srv.Get();
     commandList->OMSetRenderTargets(1, &currFrameRes.backBufferHandle.cpu, TRUE, &dsHandle_.cpu);
     commandList->SetGraphicsRootSignature(renderLayers_[render::Shader::opaque].rootSignature.Get());
     commandList->SetGraphicsRootConstantBufferView(1, currFrameRes.passBuffer.GpuStart());
-    ID3D12DescriptorHeap* srvDesc = heaps_.srv.Get();
     commandList->SetDescriptorHeaps(1, &srvDesc);
-
     renderLayers_.DrawLayer(commandList, currFrameRes, renderElements_, render::Shader::opaque);
 
+    // Draws other layers 
     for (u32 i = 1; i < render::Shader::count - 1; ++i) {
         renderLayers_[i].Set(commandList);
         renderLayers_.DrawLayer(commandList, currFrameRes, renderElements_, i);
     }
 
+    // Draws effect layer
     renderLayers_[render::Shader::grid].Set(commandList);
     renderLayers_.DrawEffectLayer(commandList, render::Shader::grid);
 
+    // Barrier transition RenderTarget -> Present
     auto presentBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
             currFrameRes.backBuffer.Get(),
             D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT );
@@ -282,17 +403,36 @@ void Dx12::PrepareRender() {
     commandList->Close() >> utl::DxCheck;
 }
 
-
+/**
+ * @brief Dx12::Draw
+ * 
+ * Execute recorded commands and present the frame
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::Draw() {
     cmdManager_.Execute();
+
 #ifdef IMGUI
     ImGui::UpdatePlatformWindows();
     ImGui::RenderPlatformWindowsDefault(nullptr, (void*)cmdManager_.List());
 #endif
+
     swapChain_->Present(0, presentInfo_) >> utl::DxCheck;
     cmdManager_.MoveToNextFrame();
 }
 
+/**
+ * @brief Dx12::Resize
+ * 
+ * Resizes all buffers when window is resized
+ * 
+ * @param[in] res New window resolution
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::Resize(const window::Resolution &res) {
     if (res.aspectRatio == resolution_->aspectRatio) {
         return;
@@ -331,6 +471,15 @@ void Dx12::Resize(const window::Resolution &res) {
     SetViewport();
 }
 
+/**
+ * @brief Dx12::Terminate
+ * 
+ * Temrinates the rendering engine, releasing all resources 
+ * and waiting gpu exection
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::Terminate() {
 #ifdef _DEBUG
     utl::QueueInfo(device_.Get(), FALSE);
@@ -351,6 +500,16 @@ void Dx12::Terminate() {
     CleanDeferredResources(heaps_);
 }
 
+/**
+ * @brief Dx12::CreateRenderElement
+ * 
+ * Creates a render element for the specified entity 
+ * 
+ * @param[in] index Entity id
+ * 
+ * @returns
+ *  - None
+ */
 void Dx12::CreateRenderElement(u32 index) {
     core::Geometry &geometry = core::scene.GetEntity(index).Geometry();
     geometry.MarkAsStored();
@@ -387,6 +546,5 @@ void Dx12::CreateRenderElement(u32 index) {
     }
 
 }
-
 
 }

@@ -18,8 +18,8 @@
 #endif
 
 
-#include "dx_commands.hpp"
 #include "dx_common.hpp"
+#include "dx_commands.hpp"
 #include "dx_render_info.hpp"
 #include "dx_render_layers.hpp"
 #include "resources/dx_resources.hpp"
@@ -33,7 +33,9 @@
 
 namespace reveal3d::graphics {
 
-
+/**
+ * @brief Dx12 main rendering class
+ */
 __declspec(align(16))
 class Dx12 {
 public:
@@ -59,13 +61,12 @@ private:
     void InitConstantBuffers();
     void SetViewport();
     void CreateRenderElement(u32 index);
-    /****************** Factory and Device *****************/
 
+    /****************** Factory and Device *****************/
     ComPtr<IDXGIFactory5> factory_;
     ComPtr<ID3D12Device> device_;
 
-    /****************** Frame resources, depth stencil and swapchain *****************/
-
+    /****************** Frame resources and swapchain *****************/
     dx12::FrameResource frameResources_[dx12::frameBufferCount];
     ComPtr<IDXGISwapChain3> swapChain_;
 
@@ -73,6 +74,7 @@ private:
     ComPtr<ID3D12Resource> depthStencilBuffer_;
     dx12::DescriptorHandle dsHandle_;
 
+    /***************** Descriptor heaps and commands list/queue **********************/
     dx12::Heaps heaps_;
     dx12::Commands cmdManager_;
 

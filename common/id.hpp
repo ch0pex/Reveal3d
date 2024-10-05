@@ -66,7 +66,7 @@ constexpr id_t newGeneration(id_t idx) {
 
 class Factory { 
 public:
-    INLINE bool UseFree() {
+    bool UseFree() {
         return (freeIndices_.size() > id::maxFree);
     }
 
@@ -81,30 +81,34 @@ public:
         return true;
     }
 
+    u32 GetMappedId(id_t componentId) { ; }
+
     id_t New() {
         id_t id;
         if (UseFree()) {
-            id = id::index(mappedIds_.size());
+            id = id::index(count_++);
             ++generations_[id];
             id |=  (generations_.at(freeIndices_.front()) << indexBits);
             freeIndices_.pop_front();
         } else {
-            id = id::index(mappedIds_.size());
+            id = id::index(count_++);
             generations_.push_back(0);
         }
         return id;
     }
 
-    void Remove(id_t id) {
-        assert(IsAlive(id));
-        if (generations_[mappedIds_.at(idx)] < maxGeneration) {
+    void Remove(id_t idx) {
+        assert(IsAlive(idx));
+        if (generations_.at(idx) < maxGeneration) {
            freeIndices_.push_back(idx);
+           --count_;
         }
     }
 
 private:
     utl::vector<id_t>   generations_;
     std::deque<id_t>    freeIndices_;
+    u32                 count_;
 };
 
 }

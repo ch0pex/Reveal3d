@@ -58,6 +58,7 @@ public:
     constexpr u64 size();
     constexpr bool empty();
     constexpr void clear();
+    constexpr T& back();
 private:
     constexpr void reset();
     constexpr void clear_range(u64 first, u64 last);
@@ -154,6 +155,12 @@ template<typename T, bool destruct>
 constexpr T &vector<T, destruct>::at(u64 index) {
     assert(index < size_);
     return data_[index];
+}
+
+template<typename T, bool destruct>
+constexpr T& vector<T, destruct>::back() {
+    assert(size_ > 0);
+    return data_[size_ - 1];
 }
 
 template<typename T, bool destruct>

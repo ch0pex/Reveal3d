@@ -31,36 +31,39 @@ public:
     T At(id_t id)                       { return components_.at(id::index(id)); }
     std::vector<T>::iterator begin()    { return components_.begin(); };
     std::vector<T>::iterator end()      { return components_.end();   };
-    INLINE u32 GetMappedId(id_t componentId) { return id_factory_.MappedId(id::index(componentId)); }
+    INLINE u32 GetMappedId(id_t componentId) { return mappedIdx_.at(id::index(componentId)); }
 
 
 protected:
     void Add(id_t index, id_t id) {
         if (index >= components_.size()) {
             components_.emplace_back(id);
-            owner_ids_.push_back(id);
+            owner_ids_.push_back(index);
             mappedIdx_.push_back(index);
         } else {
             components_.at(index) = T(id);
-            owner_ids_.push_back(id);
+            owner_ids_.push_back(index);
             mappedIdx_.at(id::index(id)) = index;
         }
     }
 
     void Remove(id_t id) {
-        auto last = owner_ids_.back();
+        const auto last = owner_ids_.back();
+        const u32 idx = mappedIdx_.at(id::index(id));
         if (last != id) {
             components_.at(id::index(last)) = T(id::index(id) | id::generation(last));
         }
-        components_.at(id::index(id)) = T(id::invalid);
-        id_factory_.Remove(id);
+        components_.at(idx) = T(id::invalid);
+        mappedIdx_.at(id::index(id)) = last;
+        owner_ids_.unordered_remove(id::index(id));
+        id_factory_.Remove(idx);
     }
 
     /************* Components IDs ****************/
     id::Factory                     id_factory_;
     std::vector<T>                  components_;
-    std::vector<id_t>               mappedIdx_; // mappedIdx[componentId] == component index in components
-    std::vector<id_t>               owner_ids_; // IDs that has geometries
+    utl::vector<id_t>               mappedIdx_; // mappedIdx[componentId] == component index in components
+    utl::vector<id_t>               owner_ids_; // IDs that has geometries
 };
 
 }

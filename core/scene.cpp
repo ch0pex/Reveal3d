@@ -63,7 +63,6 @@ Entity Scene::NewChildEntity(id_t parent) { return NewChildEntity(Entity(parent)
 
 Entity Scene::NewChildEntity(Entity parent) {
     const id_t id = sceneGraph_.size() > id::maxFree ? freeNodes_.front() : sceneGraph_.size();
-    freeNodes_.pop_front();
     Entity child(id::newGeneration(id));
 
     Node childNode {

@@ -11,9 +11,9 @@
  * Generation and index identifiers 
  * 
  *  |----------------------32 bits ---------------------|
- * 
+ *
  *  |-----8 bits-----|-------------24 bits--------------|
- * 
+ *
  *  -----------------------------------------------------
  *  |  Generation   |              Index                |
  *  -----------------------------------------------------
@@ -72,12 +72,15 @@ public:
 
     bool IsAlive(id_t id) {
         id_t idx {id::index(id)};
-        if (idx >= generations_.size())
+        if (idx >= generations_.size()) {
             return false;
-        if (id == id::invalid)
+        }
+        if (id == id::invalid) {
             return false;
-        if (id::generation(id) != generations_.at(id::index(id)))
+        }
+        if (id::generation(id) != generations_.at(id::index(id))) {
             return false;
+        }
         return true;
     }
 

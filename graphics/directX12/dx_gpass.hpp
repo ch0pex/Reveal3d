@@ -37,7 +37,7 @@ public:
       D3D12_CPU_DESCRIPTOR_HANDLE const back_buffer
   ) const {
 
-    command_list->ClearRenderTargetView(back_buffer, math::utl::to_array(config::scene.clearColor).data(), 0, nullptr);
+    command_list->ClearRenderTargetView(back_buffer, config::scene.clearColor.data(), 0, nullptr);
     command_list->ClearDepthStencilView(
         depth_buffer_.handle().cpu, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0F, 0, 0, nullptr
     );

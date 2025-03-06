@@ -89,7 +89,7 @@ void OpenGL::update(core::Scene& scene, render::Camera const& camera) {
 
 void OpenGL::renderSurface(surface& surface) {
   glClearColor(
-      config::scene.clearColor.x, config::scene.clearColor.y, config::scene.clearColor.z, config::scene.clearColor.w
+      config::scene.clearColor[0], config::scene.clearColor[1], config::scene.clearColor[2], config::scene.clearColor[3]
   );
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

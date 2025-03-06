@@ -55,8 +55,8 @@ struct Backends {
 struct General { };
 
 struct Scene {
-  math::vec4 clearColor = {0.2F, 0.2F, 0.2F, 1.0F};
-  bool showGrid         = true;
+  std::array<f32, 4> clearColor = {0.2F, 0.2F, 0.2F, 1.0F};
+  bool showGrid                 = true;
 };
 
 struct Render {

@@ -26,13 +26,14 @@ set(IMGUI_BACKENDS
 )
 
 if (WIN32)
-    list(APPEND ${IMGUI_BACKENDS}
+    message("-- Adding IMGUI WIN32 implementation sources")
+    list(APPEND IMGUI_BACKENDS
             ${IMGUI_DIR}/backends/imgui_impl_dx12.cpp
             ${IMGUI_DIR}/backends/imgui_impl_dx12.h
             ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
             ${IMGUI_DIR}/backends/imgui_impl_win32.h
-            ${IMGUI_DIR}/imgui_impl_dx11.cpp
-            ${IMGUI_DIR}/imgui_impl_dx11.h
+            ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp
+            ${IMGUI_DIR}/backends/imgui_impl_dx11.h
     )
 endif ()
 

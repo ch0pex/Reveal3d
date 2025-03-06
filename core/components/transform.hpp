@@ -64,12 +64,8 @@ public:
     setDirty();
   }
 
-  void rotation(math::xvec3 const rot) const {
-    pool().posRotScale(id_).rotation = vec_to_radians(rot);
-    setDirty();
-  }
-
-  void rotation(math::xvec4 const rot) const {
+  template<typename Vector>
+  void rotation(Vector const rot) const {
     pool().posRotScale(id_).rotation = vec_to_radians(rot);
     setDirty();
   }

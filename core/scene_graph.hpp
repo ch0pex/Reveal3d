@@ -36,10 +36,9 @@ public:
     return at(id::index(id)).entity != id::invalid;
   }
 
-  template<typename Self>
-  auto&& at(this Self&& self, id_t const id) {
-    return std::forward<Self>(self).nodes.at(id::index(id));
-  }
+  auto at(id_t const id) -> Node& { return nodes.at(id::index(id)); }
+
+  auto at(id_t const id) const -> Node const& { return nodes.at(id::index(id)); }
 
   auto begin() { return nodes.begin(); }
 

@@ -22,7 +22,8 @@ namespace reveal3d::render {
 
 class Camera {
 public:
-  explicit Camera(window::Resolution const& res) : resolution_(res) {
+  explicit Camera(window::Resolution const& res) :
+    projection_matrix_(), view_matrix_(), view_projection_matrix_(), resolution_(res) {
     using namespace input;
 
     add_handler_down(Action::CameraUp, {.callback = [this](Action const act, type const t) { move(act, t); }});
@@ -144,9 +145,9 @@ private:
     if (is_moving_.at(Bckwd))
       position_ += speed_factor * -front_;
     if (is_moving_.at(Up))
-      position_ += speed_factor * math::xvec4(config_.world_up);
+      position_ += speed_factor * math::xvec3(config_.world_up);
     if (is_moving_.at(Down))
-      position_ += speed_factor * -math::xvec4(config_.world_up);
+      position_ += speed_factor * -math::xvec3(config_.world_up);
     if (is_moving_.at(Right))
       position_ += speed_factor * right_;
     if (is_moving_.at(Left))

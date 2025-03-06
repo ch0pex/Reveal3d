@@ -11,6 +11,7 @@ include_directories(PUBLIC .)
 
 add_library(Reveal3d STATIC)
 
+
 include(cmake/source.cmake)
 include(cmake/extern.cmake)
 include(cmake/platform.cmake)

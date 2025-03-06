@@ -27,6 +27,6 @@ void Glfw::closeWindow(input::Action act, input::type type) {
   // Close Window
 }
 
-bool window::Glfw::shouldClose() { return glfwWindowShouldClose(win_ptr_); }
+bool window::Glfw::shouldClose() { return glfwWindowShouldClose(window_pointer_); }
 
 } // namespace reveal3d::window

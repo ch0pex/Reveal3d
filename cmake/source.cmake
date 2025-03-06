@@ -57,6 +57,11 @@ set(CONFIG
 
 set(MATH
         math/math.hpp
+        math/vector.hpp
+        math/utils.hpp
+        math/concepts.hpp
+        math/operators.hpp
+        math/matrix.hpp
 )
 
 set(WINDOW

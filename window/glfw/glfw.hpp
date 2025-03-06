@@ -18,6 +18,7 @@
 #include "window/window_info.hpp"
 
 #include "GLFW/glfw3.h"
+#include "GLFW/glfw3native.h"
 
 
 namespace reveal3d::window {
@@ -60,11 +61,11 @@ void Glfw::create(render::Renderer<Gfx>& renderer) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef WIN32
-  win_ptr_ = glfwCreateWindow(1920, 1080, "CraftGL", NULL, NULL);
-  if (!win_ptr_) {
+  window_pointer_ = glfwCreateWindow(1920, 1080, "CraftGL", NULL, NULL);
+  if (!window_pointer_) {
     logger(LogError) << "Create window error\n";
   }
-  info_.handle.hwnd = glfwGetWin32Window(win_ptr_);
+  info_.handle.hwnd = glfwGetWin32Window(window_pointer_);
 
   if (info_.handle.hwnd == nullptr) {
     glfwTerminate();

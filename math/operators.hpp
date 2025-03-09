@@ -13,107 +13,101 @@
 
 #pragma once
 
-#include "vector.hpp"
-#include "matrix.hpp"
 #include "concepts.hpp"
+#include "matrix.hpp"
+#include "vector.hpp"
+
+#include <iostream>
 
 namespace reveal3d::math {
 
 // clang-format off
 
-template<algebra_type T> auto operator+(T lh, T const rh) { lh += rh; return lh; }
-
-template<algebra_type T> auto operator-(T lh, T const rh) { lh -= rh; return lh; }
-
-template<algebra_type T> auto operator*(T lh, T const rh) { lh *= rh; return lh; }
-
-template<algebra_type T> auto operator/(T lh, T const rh) { lh /= rh; return lh; }
-
-auto operator+(algebra_type auto lh, scalar auto const rh) { lh += rh; return lh; }
-
-auto operator-(algebra_type auto lh, scalar auto const rh) { lh -= rh; return lh; }
-
-auto operator*(algebra_type auto lh, scalar auto const rh) { lh *= rh; return lh; }
-
-auto operator/(algebra_type auto lh, scalar auto const rh) { lh /= rh; return lh; }
-
-auto operator+(scalar auto const lh, algebra_type auto rh) { rh += lh; return rh; }
-
-auto operator-(scalar auto const lh, algebra_type auto rh) { rh -= lh; return rh; }
-
-auto operator*(scalar auto const lh, algebra_type auto rh) { rh *= lh; return rh; }
-
-auto operator/(scalar auto const lh, algebra_type auto rh) { rh /= lh; return rh; }
+template<scalar T>
+std::ostream& operator<<(std::ostream& os, Vec2<T> const obj) {
+  os << "{" << obj.x << ", " << obj.y << "}";
+  return os;
+}
 
 template<scalar T>
-auto operator*(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
+std::ostream& operator<<(std::ostream& os, Vec3<T> const obj) {
+  os << "{" << obj.x << ", " << obj.y << ", " << obj.z << "}";
+  return os;
+}
+
+template<scalar T>
+std::ostream& operator<<(std::ostream& os, Vec4<T> const obj) {
+  os << "{" << obj.x << ", " << obj.y << ", " << obj.z << ", " << obj.w << "}";
+  return os;
+}
+
+template<scalar T>
+std::ostream& operator<<(std::ostream& os, Mat3x3<T> const& mat) {
+  os << mat.x  << "\n" << mat.y << "\n" << mat.z << "\n";
+  return os;
+}
+
+template<scalar T>
+std::ostream& operator<<(std::ostream& os, Mat4x4<T> const& mat) {
+  os << mat.x  << "\n" << mat.y << "\n" << mat.z << "\n" << mat.w << "\n";
+  return os;
+}
+
+template<scalar T> constexpr bool operator==(Vec2<T> const lhs, Vec2<T> const rhs) { return lhs.x == rhs.x and lhs.y == rhs.y; }
+
+template<scalar T> constexpr bool operator==(Vec3<T> const lhs, Vec3<T> const rhs) { return lhs.x == rhs.x and lhs.y == rhs.y and lhs.z == rhs.z; }
+
+template<scalar T> constexpr bool operator==(Vec4<T> const lhs, Vec4<T> const rhs) { return lhs.x == rhs.x and lhs.y == rhs.y and lhs.z == rhs.z and lhs.w == rhs.w; }
+
+template<scalar T> constexpr bool operator==(Mat3x3<T> const& lhs, Mat3x3<T> const& rhs) { return lhs.x == rhs.x and lhs.y == rhs.y and lhs.z == rhs.z; }
+
+template<scalar T> constexpr bool operator==(Mat4x4<T> const& lhs, Mat4x4<T> const& rhs) { return lhs.x == rhs.x and lhs.y == rhs.y and lhs.z == rhs.z and lhs.w == rhs.w; }
+
+template<algebra_type T> constexpr  bool operator!=(T const& lhs, T const& rhs) { return !(lhs == rhs); }
+
+template<algebra_type T> constexpr auto operator+(T lh, T const rh) { lh += rh; return lh; }
+
+template<algebra_type T> constexpr auto operator-(T lh, T const rh) { lh -= rh; return lh; }
+
+template<algebra_type T> constexpr auto operator*(T lh, T const rh) { lh *= rh; return lh; }
+
+template<algebra_type T> constexpr auto operator/(T lh, T const rh) { lh /= rh; return lh; }
+
+constexpr auto operator+(algebra_type auto lh, scalar auto const rh) { lh += rh; return lh; }
+
+constexpr auto operator-(algebra_type auto lh, scalar auto const rh) { lh -= rh; return lh; }
+
+constexpr auto operator*(algebra_type auto lh, scalar auto const rh) { lh *= rh; return lh; }
+
+constexpr auto operator/(algebra_type auto lh, scalar auto const rh) { lh /= rh; return lh; }
+
+constexpr auto operator+(scalar auto const lh, algebra_type auto rh) { rh += lh; return rh; }
+
+constexpr auto operator-(scalar auto const lh, algebra_type auto rh) { rh -= lh; return rh; }
+
+constexpr auto operator*(scalar auto const lh, algebra_type auto rh) { rh *= lh; return rh; }
+
+constexpr auto operator/(scalar auto const lh, algebra_type auto rh) { rh /= lh; return rh; }
+
+template<scalar T>
+constexpr auto operator*(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
    return {mat3.x * vec3, mat3.y * vec3, mat3.z * vec3};
 }
 
 template<scalar T>
-auto operator/(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
+constexpr auto operator/(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
    return {dot(mat3.x, vec3), dot(mat3.y, vec3), dot(mat3.z, vec3)};
 }
 
 template<scalar T>
-auto operator*(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
+constexpr auto operator*(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
    return {dot(mat4.x, vec4), dot(mat4.y, vec4), dot(mat4.z, vec4), dot(mat4.w, vec4)};
 }
 
 template<scalar T>
-auto operator/(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
+constexpr auto operator/(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
    return {mat4.x / vec4, mat4.y / vec4, mat4.z / vec4, mat4.w / vec4};
 }
-
-/*
-template<vector T> T operator+(T lh, T const rh) { lh += rh; return lh; }
-
-template<vector T> T operator-(T lh, T const rh) { lh -= rh; return lh; }
-
-template<vector T> T operator*(T lh, T const rh) { lh *= rh; return lh; }
-
-template<vector T> T operator/(T lh, T const rh) { lh /= rh; return lh; }
-
-template<matrix T> T operator+(T lh, T const& rh) { lh += rh; return lh; }
-
-template<matrix T> T operator-(T lh, T const& rh) { lh -= rh; return lh; }
-
-template<matrix T> T operator*(T lh, T const& rh) { lh *= rh; return lh; }
-
-template<matrix T> T operator/(T lh, T const& rh) { lh /= rh; return lh; }
-
-template<vector T> T operator+(T lh, scalar auto const rh) { lh += rh; return lh; }
-
-template<vector T> T operator-(T lh, scalar auto const rh) { lh -= rh; return lh; }
-
-template<vector T> T operator*(T lh, scalar auto const rh) { lh *= rh; return lh; }
-
-template<vector T> T operator/(T lh, scalar auto const rh) { lh /= rh; return lh; }
-
-template<matrix T> T operator+(T lh, scalar auto const rh) { lh += rh; return lh; }
-
-template<matrix T> T operator-(T lh, scalar auto const rh) { lh -= rh; return lh; }
-
-template<matrix T> T operator*(T lh, scalar auto const rh) { lh *= rh; return lh; }
-
-template<matrix T> T operator/(T lh, scalar auto const rh) { lh /= rh; return lh; }
-
-template<vector T> T operator+(scalar auto lh, T const rh) { rh += lh; return rh; }
-
-template<vector T> T operator-(scalar auto lh, T const rh) { rh -= lh; return rh; }
-
-template<vector T> T operator*(scalar auto lh, T const rh) { rh *= lh; return rh; }
-
-template<vector T> T operator/(scalar auto lh, T const rh) { rh /= lh; return rh; }
-
-template<matrix T> T operator+(scalar auto lh, T const& rh) { rh += lh; return rh; }
-
-template<matrix T> T operator-(scalar auto lh, T const& rh) { rh -= lh; return rh; }
-
-template<matrix T> T operator*(scalar auto lh, T const& rh) { rh *= lh; return rh; }
-
-template<matrix T> T operator/(scalar auto lh, T const& rh) { rh /= lh; return rh; }
-*/
 
 // clang-format on
 

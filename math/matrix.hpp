@@ -33,19 +33,19 @@ struct Mat3x3 : ScalarOperators {
 
   constexpr Mat3x3 operator+() const { return {+x, +y, +z}; }
 
-  constexpr Mat3x3 operator+=(Mat3x3 const& m2) const { x += m2.x, y += m2.y, z += m2.z; return *this; }
+  constexpr Mat3x3 operator+=(Mat3x3 const& m2) { x += m2.x, y += m2.y, z += m2.z; return *this; }
 
-  constexpr Mat3x3 operator-=(Mat3x3 const& m2) const { x -= m2.x, y -= m2.y, z -= m2.z; return *this; }
+  constexpr Mat3x3 operator-=(Mat3x3 const& m2) { x -= m2.x, y -= m2.y, z -= m2.z; return *this; }
 
   constexpr Mat3x3 operator*=(Mat3x3 const m2) {
     auto const m2_trans = transpose(m2);
-    x = { dot(x, m2.x), dot(x, m2.y), dot(x, m2.z)};
-    y = { dot(y, m2.x), dot(y, m2.y), dot(y, m2.z)};
-    z = { dot(z, m2.x), dot(z, m2.y), dot(z, m2.z)};
+    x = { dot(x, m2_trans.x), dot(x, m2_trans.y), dot(x, m2_trans.z)};
+    y = { dot(y, m2_trans.x), dot(y, m2_trans.y), dot(y, m2_trans.z)};
+    z = { dot(z, m2_trans.x), dot(z, m2_trans.y), dot(z, m2_trans.z)};
     return *this;
   }
 
-  constexpr Mat3x3 operator/=(Mat3x3 const m2) const {
+  constexpr Mat3x3 operator/=(Mat3x3 const m2) {
     *this *= inverse(m2);
     return *this;
   }
@@ -85,14 +85,14 @@ struct Mat4x4 : ScalarOperators {
 
   constexpr Mat4x4 operator*=(Mat4x4 const& m2) {
     auto const m2_trans = transpose(m2);
-    x = {dot(x, m2.x), dot(x, m2.y), dot(x, m2.z), dot(x, m2.w)};
-    y = {dot(y, m2.x), dot(y, m2.y), dot(y, m2.z), dot(y, m2.w)};
-    z = {dot(z, m2.x), dot(z, m2.y), dot(z, m2.z), dot(z, m2.w)};
-    w = {dot(w, m2.x), dot(w, m2.y), dot(w, m2.z), dot(w, m2.w)};
+    x = {dot(x, m2_trans.x), dot(x, m2_trans.y), dot(x, m2_trans.z), dot(x, m2_trans.w)};
+    y = {dot(y, m2_trans.x), dot(y, m2_trans.y), dot(y, m2_trans.z), dot(y, m2_trans.w)};
+    z = {dot(z, m2_trans.x), dot(z, m2_trans.y), dot(z, m2_trans.z), dot(z, m2_trans.w)};
+    w = {dot(w, m2_trans.x), dot(w, m2_trans.y), dot(w, m2_trans.z), dot(w, m2_trans.w)};
     return *this;
   }
 
-  constexpr Mat4x4 operator/=(Mat4x4 const& m2) const {
+  constexpr Mat4x4 operator/=(Mat4x4 const& m2) {
    *this *= inverse(m2);
     return *this;
   }
@@ -116,4 +116,4 @@ using mat4 = Mat4x4<f32>;
 static_assert(matrix<mat3>);
 static_assert(matrix<mat4>);
 
-} // namespace reveal3d::math::detail
+} // namespace reveal3d::math

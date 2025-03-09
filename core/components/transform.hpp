@@ -64,8 +64,7 @@ public:
     setDirty();
   }
 
-  template<typename Vector>
-  void rotation(Vector const rot) const {
+  void rotation(math::vec3 const rot) const {
     pool().posRotScale(id_).rotation = vec_to_radians(rot);
     setDirty();
   }
@@ -74,7 +73,7 @@ public:
     auto& [position, rotation, scale] = pool().posRotScale(id_);
     pool().world(id_)                 = transpose(affine_transformation(new_position, scale, rotation));
     if (auto const parent = entity().parent(); parent.isAlive()) {
-      position = math::vec3{transpose(parent.component<Transform>().invWorld()) * math::vec4{new_position}};
+      position = math::vec3 {transpose(parent.component<Transform>().invWorld()) * math::vec4 {new_position}};
     }
     else {
       position = new_position;
@@ -88,7 +87,7 @@ public:
     auto& [position, rotation, scale] = pool().posRotScale(id_);
     pool().world(id_)                 = transpose(affine_transformation(position, new_scale, rotation));
     if (Entity const parent = entity().parent(); parent.isAlive()) {
-      scale = math::vec3{parent.component<Transform>().invWorld() * math::vec4{new_scale}};
+      scale = math::vec3 {parent.component<Transform>().invWorld() * math::vec4 {new_scale}};
     }
     else {
       scale = new_scale;
@@ -103,7 +102,7 @@ public:
     auto const rad = vec_to_radians(new_rot);
     world()        = transpose(affine_transformation(position, scale, rad));
     if (Entity const parent = entity().parent(); parent.isAlive()) {
-      rotation = math::vec3{parent.component<Transform>().invWorld() * math::vec4{rad}};
+      rotation = math::vec3 {parent.component<Transform>().invWorld() * math::vec4 {rad}};
     }
     else {
       rotation = rad;

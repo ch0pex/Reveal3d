@@ -28,25 +28,25 @@ struct Vec2 {
 
   constexpr explicit Vec2(T const s) : x {s}, y {s} { }
 
-  constexpr Vec2 operator-() const { return {-x, -y}; }
+  constexpr Vec2 operator-() { return {-x, -y}; }
 
-  constexpr Vec2 operator+() const { return {+x, +y}; }
+  constexpr Vec2 operator+() { return {+x, +y}; }
 
-  constexpr Vec2 operator+=(Vec2 const v2) const { x += v2.x, y += v2.y; return *this; }
+  constexpr Vec2 operator+=(Vec2 const v2) { x += v2.x, y += v2.y; return *this; }
 
-  constexpr Vec2 operator-=(Vec2 const v2) const { x -= v2.x, y -= v2.y; return *this; }
+  constexpr Vec2 operator-=(Vec2 const v2) { x -= v2.x, y -= v2.y; return *this; }
 
-  constexpr Vec2 operator*=(Vec2 const v2) const { x *= v2.x, y *= v2.y; return *this; }
+  constexpr Vec2 operator*=(Vec2 const v2) { x *= v2.x, y *= v2.y; return *this; }
 
-  constexpr Vec2 operator/=(Vec2 const v2) const { x /= v2.x, y /= v2.y; return *this; }
+  constexpr Vec2 operator/=(Vec2 const v2) { x /= v2.x, y /= v2.y; return *this; }
 
-  constexpr Vec2 operator+=(T const s) const { *this += Vec2(s); return *this; }
+  constexpr Vec2 operator+=(T const s) { *this += Vec2(s); return *this; }
 
-  constexpr Vec2 operator-=(T const s) const { *this -= Vec2(s); return *this; }
+  constexpr Vec2 operator-=(T const s) { *this -= Vec2(s); return *this; }
 
-  constexpr Vec2 operator*=(T const s) const { *this *= Vec2(s); return *this; }
+  constexpr Vec2 operator*=(T const s) { *this *= Vec2(s); return *this; }
 
-  constexpr Vec2 operator/=(T const s) const { *this /= Vec2(s); return *this; }
+  constexpr Vec2 operator/=(T const s) { *this /= Vec2(s); return *this; }
 
   template<scalar U> explicit constexpr operator Vec2<U>() const { return {x, y}; }
 

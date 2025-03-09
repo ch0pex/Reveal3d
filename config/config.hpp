@@ -13,43 +13,72 @@
 
 #pragma once
 
-#include "math/math.hpp"
-
+#include <array>
 #include <string_view>
+#include "math/math.hpp"
 
 namespace reveal3d::config {
 
 namespace backends {
 
-enum window { win32 = 0, glfw };
+enum window {
+#ifdef WIN32
+  win32 = 0,
+#endif
+  glfw
+};
 
-enum renderer { directx11 = 0, directx12, vulkan, openGl, metal };
+enum renderer {
+#ifdef WIN32
+  directx11 = 0,
+  directx12,
+#endif
+  vulkan,
+  openGl,
+  metal
+};
+
+#ifdef WIN32
+
+constexpr renderer default_renderer     = directx12;
+constexpr window default_window_manager = win32;
+
+#else
+
+constexpr renderer default_renderer     = openGL;
+constexpr window default_window_manager = glfw;
+
+#endif
 
 inline renderer get_graphics_backend(std::string_view const name) {
+#ifdef WIN32
   if (name == "directx11")
     return directx11;
   if (name == "directx12")
     return directx12;
+#endif
   if (name == "vulkan")
     return vulkan;
   if (name == "openGl")
     return openGl;
-  return directx12;
+  return default_renderer;
 }
 
 inline window get_window_backend(std::string_view const name) {
+#ifdef WIN32
   if (name == "win32")
     return win32;
+#endif
   if (name == "glfw")
     return glfw;
-  return win32;
+  return default_window_manager;
 }
 
 } // namespace backends
 
 struct Backends {
-  backends::window window {backends::win32};
-  backends::renderer renderer {backends::directx12};
+  backends::window window {backends::default_window_manager};
+  backends::renderer renderer {backends::default_renderer};
 };
 
 struct General { };
@@ -80,7 +109,7 @@ struct Render {
 };
 
 struct Window {
-  backends::window backend {backends::win32};
+  backends::window backend {backends::default_window_manager};
   std::string_view title = "Reveal3D";
   math::vec2 resolution  = {1920, 1080};
 };

@@ -13,9 +13,9 @@
 
 #pragma once
 
-#include "material.hpp"
 #include "vertex.hpp"
 
+#include <vector>
 
 namespace reveal3d::render {
 

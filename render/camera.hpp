@@ -95,8 +95,9 @@ public:
   void update(Timer const& timer) {
     updatePos(static_cast<f32>(timer.frameTime()));
     updateFront();
-    view_matrix_            = look_at(position_, position_ + front_, up_);
+    view_matrix_            = look_at(position_, -front_, -right_, -up_);
     view_projection_matrix_ = view_matrix_ * projection_matrix_;
+    logger(LogInfo) << "Camera position: " << position_.x << ", " << position_.y << ", " << position_.z;
   }
 
 
@@ -149,34 +150,51 @@ private:
       position_ += speed_factor * config_.world_up;
     if (is_moving_.at(Down))
       position_ += speed_factor * -config_.world_up;
-    if (is_moving_.at(Right))
-      position_ += speed_factor * right_;
     if (is_moving_.at(Left))
+      position_ += speed_factor * right_;
+    if (is_moving_.at(Right))
       position_ += speed_factor * -right_;
   }
 
   void updateFront() {
     if (!is_looking_)
       return;
+
     f32 x_offset = new_pos_.x - last_pos_.x;
     f32 y_offset = last_pos_.y - new_pos_.y;
 
+    // Ajustar la sensibilidad en el offset
     x_offset *= config_.sensitivity;
     y_offset *= config_.sensitivity;
+
+    // Actualizar los ángulos de rotación
     yaw_ += x_offset;
     pitch_ += y_offset;
 
+    // Limitar el pitch para evitar que la cámara gire completamente
     pitch_ = std::min(pitch_, 89.0F);
     pitch_ = std::max(pitch_, -89.0F);
 
+    // r es el coseno de pitch para mantener la rotación sobre el eje Z
     math::scalar auto const r = math::cos(math::radians(pitch_));
+
+    // Ajustar las fórmulas de la dirección 'front_'
     math::vec3 const new_front {
-      r * math::cos(math::radians(yaw_)), r * math::sin(math::radians(yaw_)), math::sin(math::radians(pitch_))
+      r * math::cos(math::radians(yaw_)), // Movimiento en el eje Y
+      r * math::sin(math::radians(yaw_)), // Movimiento en el eje X
+      math::sin(math::radians(pitch_)) // Movimiento en el eje Z (usando pitch para la rotación sobre Z)
     };
 
-    front_    = normalize(new_front);
-    right_    = normalize(cross(front_, config_.world_up));
-    up_       = normalize(cross(right_, front_));
+    // Normalizar la nueva dirección 'front_'
+    front_ = normalize(new_front);
+
+    // Calcular el eje 'right_' como el cruce entre el 'up_' y el 'front_'
+    right_ = normalize(cross(config_.world_up, front_));
+
+    // Calcular el eje 'up_' como el cruce entre el 'front_' y el 'right_'
+    up_ = normalize(cross(front_, right_));
+
+    // Actualizar la posición del ratón
     last_pos_ = new_pos_;
   }
 
@@ -184,7 +202,7 @@ private:
   math::vec3 position_ {-6.F, 0.F, 2.F};
   math::vec3 front_ {1, 0, 0};
   math::vec3 up_ {0.F, 0.F, 1.F};
-  math::vec3 right_;
+  math::vec3 right_ {0, 1.0, 0.0};
   math::mat4 projection_matrix_;
   math::mat4 view_matrix_;
   math::mat4 view_projection_matrix_;

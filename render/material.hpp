@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "common/common.hpp"
 #include "math/math.hpp"
 
 namespace reveal3d::render {

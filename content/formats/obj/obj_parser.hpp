@@ -16,6 +16,7 @@
 
 #include "render/mesh.hpp"
 
+#include <optional>
 #include <string_view>
 
 

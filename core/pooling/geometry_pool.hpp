@@ -15,6 +15,7 @@
 
 #include "common/common.hpp"
 #include "concepts.hpp"
+#include "render/material.hpp"
 #include "render/mesh.hpp"
 
 namespace reveal3d::core::geometry {
@@ -40,13 +41,15 @@ public:
 
   void addData(init_info const& init_info) {
     materials_.emplace_back();
-    sub_meshes_.emplace_back(render::SubMesh {
-      .vertex_pos  = 0,
-      .index_pos   = 0,
-      .index_count = static_cast<u32>(init_info.indices.size()),
-      .visible     = true,
-      .shader      = 1 // Opaque
-    });
+    sub_meshes_.emplace_back(
+        render::SubMesh {
+          .vertex_pos  = 0,
+          .index_pos   = 0,
+          .index_count = static_cast<u32>(init_info.indices.size()),
+          .visible     = true,
+          .shader      = 1 // Opaque
+        }
+    );
     total_vertices_ += init_info.vertex_count;
     total_triangles_ += init_info.triangle_count;
     meshes_.push_back(std::move(init_info));

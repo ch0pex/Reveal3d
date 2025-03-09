@@ -15,15 +15,19 @@
 
 #include "vector.hpp"
 
-namespace reveal3d::math::detail {
+namespace reveal3d::math {
 
 // clang-format off
 
-template<typename T>
-struct Mat3x3  {
+template<scalar T>
+struct Mat3x3 : ScalarOperators {
   constexpr Mat3x3() : x {}, y {}, z {} { }
 
-  constexpr Mat3x3(T x, T y, T z) : x {x}, y {y}, z {z} { }
+  constexpr Mat3x3(Vec3<T> const x, Vec3<T> const y, Vec3<T> const z) : x {x}, y {y}, z {z} { }
+
+  constexpr explicit Mat3x3(Mat4x4<T> const& m) : x {Vec3<T>(m.x)}, y {Vec3<T>(m.y)}, z {Vec3<T>(m.z)} { }
+
+  constexpr explicit Mat3x3(scalar auto s) : x {s}, y {s}, z {s} { }
 
   constexpr Mat3x3 operator-() const { return {-x, -y, -z}; }
 
@@ -33,34 +37,75 @@ struct Mat3x3  {
 
   constexpr Mat3x3 operator-=(Mat3x3 const& m2) const { x -= m2.x, y -= m2.y, z -= m2.z; return *this; }
 
-  // constexpr Mat3x3 operator*=(Mat3x3 const m2) const { x *= m2.x, y *= m2.y, z *= m2.z; return *this; }
+  constexpr Mat3x3 operator*=(Mat3x3 const m2) {
+    auto const m2_trans = transpose(m2);
+    x = { dot(x, m2.x), dot(x, m2.y), dot(x, m2.z)};
+    y = { dot(y, m2.x), dot(y, m2.y), dot(y, m2.z)};
+    z = { dot(z, m2.x), dot(z, m2.y), dot(z, m2.z)};
+    return *this;
+  }
 
-  // constexpr Mat3x3 operator/=(Mat3x3 const m2) const { x /= m2.x, y /= m2.y, z /= m2.z; return *this; }
+  constexpr Mat3x3 operator/=(Mat3x3 const m2) const {
+    *this *= inverse(m2);
+    return *this;
+  }
+
+  constexpr Mat3x3 operator+=(scalar auto const s) { *this += Mat3x3{s}; return *this; }
+
+  constexpr Mat3x3 operator-=(scalar auto const s) { *this -= Mat3x3{s}; return *this; }
+
+  constexpr Mat3x3 operator*=(scalar auto const s) { x *= s, y *= s, z *= s; return *this; }
+
+  constexpr Mat3x3 operator/=(scalar auto const s) { x /= s, y /= s, z /= s; return *this; }
+
+  // constexpr Vec3<T> operator/=(Vec3<T> const s) { x /= s, y /= s, z /= s; return *this; }
 
   Vec3<T> x, y, z;
 };
 
-template<typename T>
-struct Mat4x4 {
+template<scalar T>
+struct Mat4x4 : ScalarOperators {
   constexpr Mat4x4() : x {}, y {}, z {}, w {} { }
 
   constexpr Mat4x4(Vec4<T> const x, Vec4<T> const y, Vec4<T> const z, Vec4<T> const w) : x {x}, y {y}, z {z}, w {w} { }
 
-  constexpr Mat4x4(Mat3x3<T> xyz, T w) : x {xyz.x}, y {xyz.y}, z {xyz.z}, w {w} { }
+  constexpr Mat4x4(Mat3x3<T> const& xyz, T const w) : x {xyz.x}, y {xyz.y}, z {xyz.z}, w {w} { }
+
+  constexpr explicit Mat4x4(scalar auto s) : x {s}, y {s}, z {s}, w {s} { }
+
+  constexpr explicit Mat4x4(Mat3x3<T> const& xyz) : x {xyz.x}, y {xyz.y}, z {xyz.z}, w {} { }
 
   constexpr Mat4x4 operator-() const { return {-x, -y, -z, -w}; }
 
   constexpr Mat4x4 operator+() const { return {+x, +y, +z, +w}; }
 
-  constexpr Mat4x4 operator+=(Mat4x4 const& m2) const { x += m2.x, y += m2.y, z += m2.z, w += m2.w; return *this; }
+  constexpr Mat4x4 operator+=(Mat4x4 const& m2) { x += m2.x, y += m2.y, z += m2.z, w += m2.w; return *this; }
 
-  constexpr Mat4x4 operator-=(Mat4x4 const& m2) const { x -= m2.x, y -= m2.y, z -= m2.z, w -= m2.w; return *this; }
+  constexpr Mat4x4 operator-=(Mat4x4 const& m2) { x -= m2.x, y -= m2.y, z -= m2.z, w -= m2.w; return *this; }
 
-  // constexpr Mat4x4 operator*=(Mat4x4 const& m2) const { x *= m2.x, y *= m2.y, z *= m2.z, w *= m2.w; return *this; }
+  constexpr Mat4x4 operator*=(Mat4x4 const& m2) {
+    auto const m2_trans = transpose(m2);
+    x = {dot(x, m2.x), dot(x, m2.y), dot(x, m2.z), dot(x, m2.w)};
+    y = {dot(y, m2.x), dot(y, m2.y), dot(y, m2.z), dot(y, m2.w)};
+    z = {dot(z, m2.x), dot(z, m2.y), dot(z, m2.z), dot(z, m2.w)};
+    w = {dot(w, m2.x), dot(w, m2.y), dot(w, m2.z), dot(w, m2.w)};
+    return *this;
+  }
 
-  // constexpr Mat4x4 operator/=(Mat4x4 const& m2) const { x /= m2.x, y /= m2.y, z /= m2.z,  w /= m2.w; return *this; }
+  constexpr Mat4x4 operator/=(Mat4x4 const& m2) const {
+   *this *= inverse(m2);
+    return *this;
+  }
 
-  T x, y, z, w;
+  constexpr Mat4x4 operator+=(scalar auto const s) { *this += Mat4x4{s}; return *this; }
+
+  constexpr Mat4x4 operator-=(scalar auto const s) { *this -= Mat4x4{s}; return *this; }
+
+  constexpr Mat4x4 operator*=(scalar auto const s) { x *= s, y *= s, z *= s, w *= s; return *this; }
+
+  constexpr Mat4x4 operator/=(scalar auto const s) { x /= s, y /= s, z /= s, w /= s; return *this; }
+
+  Vec4<T> x, y, z, w;
 };
 
 // clang-format on
@@ -68,5 +113,7 @@ struct Mat4x4 {
 using mat3 = Mat3x3<f32>;
 using mat4 = Mat4x4<f32>;
 
+static_assert(matrix<mat3>);
+static_assert(matrix<mat4>);
 
 } // namespace reveal3d::math::detail

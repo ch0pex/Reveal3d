@@ -13,14 +13,25 @@
 
 #pragma once
 
-#include "matrix.hpp"
-#include "vector.hpp"
+
+#include "scalar.hpp"
+
 
 namespace reveal3d::math {
 
+template<scalar T> struct Vec2;
+
+template<scalar T> struct Vec3;
+
+template<scalar T> struct Vec4;
+
+template<scalar T> struct Mat3x3;
+
+template<scalar T> struct Mat4x4;
+
 namespace detail {
 
-template<scalar T>
+template<typename T>
 struct is_vector : std::false_type { };
 
 template<scalar T>
@@ -32,7 +43,7 @@ struct is_vector<Vec3<T>> : std::true_type { };
 template<scalar T>
 struct is_vector<Vec4<T>> : std::true_type { };
 
-template<scalar T>
+template<typename T>
 struct is_matrix : std::false_type { };
 
 template<scalar T>
@@ -49,6 +60,6 @@ template<typename T>
 concept matrix = detail::is_matrix<T>::value;
 
 template<typename T>
-concept algebra_type = detail::is_vector<T>::value or detail::is_matrix<T>::value;
+concept algebra_type = detail::is_vector<T>::value or detail::is_matrix<T>::value or scalar<T>;
 
 } // namespace reveal3d::math

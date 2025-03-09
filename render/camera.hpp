@@ -22,8 +22,7 @@ namespace reveal3d::render {
 
 class Camera {
 public:
-  explicit Camera(window::Resolution const& res) :
-    projection_matrix_(), view_matrix_(), view_projection_matrix_(), resolution_(res) {
+  explicit Camera(window::Resolution const& res) : resolution_(res) {
     using namespace input;
 
     add_handler_down(Action::CameraUp, {.callback = [this](Action const act, type const t) { move(act, t); }});
@@ -55,7 +54,7 @@ public:
 
   [[nodiscard]] math::mat4 getViewMatrix() const { return view_matrix_; }
 
-  [[nodiscard]] math::vec3 position() const { return {position_.x(), position_.y(), position_.z()}; }
+  [[nodiscard]] math::vec3 position() const { return {position_.x, position_.y, position_.z}; }
 
   [[nodiscard]] f32 fov() const { return config_.fov; }
 
@@ -94,7 +93,7 @@ public:
   /********* Input handling ************/
 
   void update(Timer const& timer) {
-    updatePos(timer.frameTime());
+    updatePos(static_cast<f32>(timer.frameTime()));
     updateFront();
     view_matrix_            = look_at(position_, position_ + front_, up_);
     view_projection_matrix_ = view_matrix_ * projection_matrix_;
@@ -125,13 +124,15 @@ public:
 
 private:
   void updateProjection() {
-    projection_matrix_ =
-        math::perspective_fov(config_.fov, resolution_.aspect_ratio(), config_.near_plane, config_.far_plane);
+    projection_matrix_ = math::perspective_fov(
+        config_.fov, resolution_.aspect_ratio(), //
+        config_.near_plane, config_.far_plane
+    );
   }
 
-  void updatePos(math::scalar const dt) {
-    u32 dirs                  = 0;
-    math::scalar speed_factor = dt * config_.movement_speed;
+  void updatePos(math::scalar auto const dt) {
+    u32 dirs                       = 0;
+    math::scalar auto speed_factor = dt * config_.movement_speed;
 
     for (auto const dir: is_moving_) {
       if (dir)
@@ -145,9 +146,9 @@ private:
     if (is_moving_.at(Bckwd))
       position_ += speed_factor * -front_;
     if (is_moving_.at(Up))
-      position_ += speed_factor * math::xvec3(config_.world_up);
+      position_ += speed_factor * config_.world_up;
     if (is_moving_.at(Down))
-      position_ += speed_factor * -math::xvec3(config_.world_up);
+      position_ += speed_factor * -config_.world_up;
     if (is_moving_.at(Right))
       position_ += speed_factor * right_;
     if (is_moving_.at(Left))
@@ -168,22 +169,22 @@ private:
     pitch_ = std::min(pitch_, 89.0F);
     pitch_ = std::max(pitch_, -89.0F);
 
-    math::scalar const r = math::cos(math::radians(pitch_));
-    math::xvec3 const new_front {
+    math::scalar auto const r = math::cos(math::radians(pitch_));
+    math::vec3 const new_front {
       r * math::cos(math::radians(yaw_)), r * math::sin(math::radians(yaw_)), math::sin(math::radians(pitch_))
     };
 
     front_    = normalize(new_front);
-    right_    = normalize(math::cross(front_, config_.world_up));
-    up_       = normalize(math::cross(right_, front_));
+    right_    = normalize(cross(front_, config_.world_up));
+    up_       = normalize(cross(right_, front_));
     last_pos_ = new_pos_;
   }
 
   // *** Data members ***
-  math::xvec3 position_ {-6.F, 0.F, 2.F};
-  math::xvec3 front_ {1, 0, 0};
-  math::xvec3 up_ {0.F, 0.F, 1.F};
-  math::xvec3 right_;
+  math::vec3 position_ {-6.F, 0.F, 2.F};
+  math::vec3 front_ {1, 0, 0};
+  math::vec3 up_ {0.F, 0.F, 1.F};
+  math::vec3 right_;
   math::mat4 projection_matrix_;
   math::mat4 view_matrix_;
   math::mat4 view_projection_matrix_;

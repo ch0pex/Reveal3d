@@ -37,29 +37,29 @@ public:
   // Todo this should be const reference
   [[nodiscard]] math::mat4& invWorld() const { return pool().invWorld(id_); }
 
-  [[nodiscard]] math::xvec3 position() const { return pool().posRotScale(id_).position; }
+  [[nodiscard]] math::vec3 position() const { return pool().posRotScale(id_).position; }
 
-  [[nodiscard]] math::xvec3 scale() const { return pool().posRotScale(id_).scale; }
+  [[nodiscard]] math::vec3 scale() const { return pool().posRotScale(id_).scale; }
 
-  [[nodiscard]] math::xvec3 rotation() const { return math::vec_to_degrees(pool().posRotScale(id_).rotation); }
+  [[nodiscard]] math::vec3 rotation() const { return math::vec_to_degrees(pool().posRotScale(id_).rotation); }
 
-  [[nodiscard]] math::xvec3 worldPosition() const {
+  [[nodiscard]] math::vec3 worldPosition() const {
     math::mat4 const world_mat = pool().world(id_);
-    return world_mat.translation();
+    return translation(world_mat);
   }
 
-  [[nodiscard]] math::xvec3 worldScale() const { return pool().world(id_).scale(); }
+  [[nodiscard]] math::vec3 worldScale() const { return math::scale(pool().world(id_)); }
 
-  [[nodiscard]] math::xvec3 worldRotation() const { return math::vec_to_degrees(pool().world(id_).rotation()); }
+  [[nodiscard]] math::vec3 worldRotation() const { return vec_to_degrees(math::rotation(pool().world(id_))); }
 
   // *** Member setters ***
 
-  void position(math::xvec3 const pos) const {
+  void position(math::vec3 const pos) const {
     pool().posRotScale(id_).position = pos;
     setDirty();
   }
 
-  void scale(math::xvec3 const size) const {
+  void scale(math::vec3 const size) const {
     pool().posRotScale(id_).scale = size;
     setDirty();
   }
@@ -70,11 +70,11 @@ public:
     setDirty();
   }
 
-  void worldPosition(math::xvec3 const new_position) const {
+  void worldPosition(math::vec3 const new_position) const {
     auto& [position, rotation, scale] = pool().posRotScale(id_);
     pool().world(id_)                 = transpose(affine_transformation(new_position, scale, rotation));
     if (auto const parent = entity().parent(); parent.isAlive()) {
-      position = transpose(parent.component<Transform>().invWorld()) * new_position;
+      position = math::vec3{transpose(parent.component<Transform>().invWorld()) * math::vec4{new_position}};
     }
     else {
       position = new_position;
@@ -84,11 +84,11 @@ public:
     softDirty();
   }
 
-  void worldScale(math::xvec3 const new_scale) const {
+  void worldScale(math::vec3 const new_scale) const {
     auto& [position, rotation, scale] = pool().posRotScale(id_);
     pool().world(id_)                 = transpose(affine_transformation(position, new_scale, rotation));
     if (Entity const parent = entity().parent(); parent.isAlive()) {
-      scale = parent.component<Transform>().invWorld() * new_scale;
+      scale = math::vec3{parent.component<Transform>().invWorld() * math::vec4{new_scale}};
     }
     else {
       scale = new_scale;
@@ -97,13 +97,13 @@ public:
     softDirty();
   }
 
-  void worldRotation(math::xvec3 const new_rot) const {
+  void worldRotation(math::vec3 const new_rot) const {
     auto& [position, rotation, scale] = pool().posRotScale(id_);
 
     auto const rad = vec_to_radians(new_rot);
     world()        = transpose(affine_transformation(position, scale, rad));
     if (Entity const parent = entity().parent(); parent.isAlive()) {
-      rotation = parent.component<Transform>().invWorld() * rad;
+      rotation = math::vec3{parent.component<Transform>().invWorld() * math::vec4{rad}};
     }
     else {
       rotation = rad;
@@ -155,7 +155,7 @@ public:
   [[nodiscard]] u8 dirty() const { return pool().dirties().at(id::index(id_)); }
 
 private:
-  [[nodiscard]] auto calcWorld(id_t const id) const {
+  [[nodiscard]] auto calcWorld(id_t const id) const -> math::mat4 {
     auto& [position, rotation, scale] = scene_->pool<Transform>().posRotScale(id);
     return transpose(affine_transformation(position, scale, rotation));
   };

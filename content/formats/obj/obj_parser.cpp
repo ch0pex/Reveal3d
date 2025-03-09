@@ -71,8 +71,8 @@ std::optional<render::Mesh> import_obj(std::string_view const path) {
   render::Mesh mesh;
   auto const start = Timer::now();
   std::ifstream file(path.data());
-  std::vector<math::xvec3> positions;
-  std::vector<math::xvec3> normals;
+  std::vector<math::vec3> positions;
+  std::vector<math::vec3> normals;
   std::vector<math::vec2> uvs;
   std::vector<detail::FaceElem> primitives;
   std::string line;

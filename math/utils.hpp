@@ -15,14 +15,15 @@
 
 #include "vector.hpp"
 
-#include <concepts>
-#include <type_traits>
-
 namespace reveal3d::math::utils {
 
-inline auto to_array(xvec3 v) { return std::array {v.x(), v.y(), v.z()}; }
-inline auto to_array(xvec4 v) { return std::array {v.x(), v.y(), v.z(), v.w()}; }
+template<typename T>
+auto to_array(Vec2<T> v) { return std::array {v.x, v.y}; }
 
+template<typename T>
+auto to_array(Vec3<T> v) { return std::array {v.x, v.y, v.z}; }
 
+template<typename T>
+auto to_array(Vec4<T> v) { return std::array {v.x, v.y, v.z, v.w}; }
 
 } // namespace reveal3d::math::utl

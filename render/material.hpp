@@ -22,7 +22,7 @@ struct Material {
   math::vec4 base_color {0.8F, 0.8F, 0.8F, 0.0F};
   math::vec3 fresnel {0.8F, 0.8F, 0.8F};
   f32 roughness {0.8F};
-  math::mat4 transform {math::mat4_identity()};
+  math::mat4 transform {}; // TODO {math::mat4_identity()};
 };
 
 } // namespace reveal3d::render

@@ -17,6 +17,32 @@
 namespace reveal3d::math {
 
 template<typename T>
-concept scalar = std::integral<T> || std::floating_point<T>;
+concept scalar = std::integral<T> or std::floating_point<T>;
 
-}
+struct ScalarOperators {
+  template<typename Self>
+  constexpr Self operator+=(this Self& self, scalar auto scalar) {
+    self += Self{scalar};
+    return self;
+  }
+
+  template<typename Self>
+  constexpr Self operator-=(this Self& self, scalar auto scalar) {
+    self -= Self{scalar};
+    return self;
+  }
+
+  template<typename Self>
+  constexpr Self operator*=(this Self& self, scalar auto scalar) {
+    self *= Self{scalar};
+    return self;
+  }
+
+  template<typename Self>
+  constexpr Self operator/=(this Self& self, scalar auto scalar) {
+    self /= Self{scalar};
+    return self;
+  }
+};
+
+} // namespace reveal3d::math

@@ -36,11 +36,12 @@ public:
 
   void update(core::Scene& scene, render::Camera const& camera);
 
-  void render() { }
+  void render() {
+    Surface mock;
+    renderSurface(mock);
+  }
 
   void renderSurface(surface& surface);
-
-  void terminate() { }
 
   void resize(window::Resolution const& res);
 

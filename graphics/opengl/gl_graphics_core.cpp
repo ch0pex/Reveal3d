@@ -15,6 +15,10 @@
 
 // #include <GL/gl.h>
 
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
+
+
 #include "config/config.hpp"
 #include "core/scene.hpp"
 #ifdef WIN32
@@ -87,7 +91,20 @@ void OpenGL::update(core::Scene& scene, render::Camera const& camera) {
   //    }
 }
 
+void imgui_render() {
+#ifdef IMGUI
+  ImGui::Render();
+#endif
+}
+
+void imgui_present() {
+#ifdef IMGUI
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#endif
+}
+
 void OpenGL::renderSurface(surface& surface) {
+  imgui_render();
   glClearColor(
       config::scene.clearColor[0], config::scene.clearColor[1], config::scene.clearColor[2], config::scene.clearColor[3]
   );
@@ -96,10 +113,11 @@ void OpenGL::renderSurface(surface& surface) {
   for (u32 i = 0; i < 4; ++i) {
     render_layers_.draw(render_elements_, pass_constant_, i);
   }
+
   swapBuffer();
+  imgui_present();
 }
 
-// void OpenGL::terminate() const { terminateContext(); }
 
 void OpenGL::resize(window::Resolution const& res) { }
 
@@ -133,6 +151,21 @@ void OpenGL::terminateContext() const {
   wglDeleteContext(window_.hglrc);
   ReleaseDC(window_.hwnd, window_.hdc);
 }
+#else
+
+void OpenGL::createContext() {
+  ImGui::CreateContext();
+}
+
+void OpenGL::swapBuffer() const {
+  glfwSwapBuffers(window_);
+}
+
+void OpenGL::terminateContext() const {
+  glfwDestroyWindow(window_);
+  glfwTerminate();
+}
+
 #endif
 
 } // namespace reveal3d::graphics

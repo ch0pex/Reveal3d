@@ -36,7 +36,7 @@ struct Resolution {
   u32 height;
 };
 
-struct Info {
+struct Descriptor {
   char const* name {config::window.title.data()};
   Resolution res {config::window.resolution};
   WHandle handle {nullptr};

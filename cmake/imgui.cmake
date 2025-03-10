@@ -1,7 +1,7 @@
 
 message("-- Compiling with IMGUI")
 target_compile_definitions(Reveal3d PUBLIC IMGUI=1)
-target_include_directories(Reveal3d PUBLIC extern/include/IMGUI)
+target_include_directories(Reveal3d PUBLIC extern/include/imgui)
 
 set(IMGUI_DIR extern/include/imgui)
 

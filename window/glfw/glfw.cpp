@@ -16,7 +16,7 @@
 
 namespace reveal3d::window {
 
-Glfw::Glfw(Info const& info) { }
+Glfw::Glfw(Descriptor const& info) { }
 
 void Glfw::show() {
   // show window

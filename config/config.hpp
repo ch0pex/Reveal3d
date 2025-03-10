@@ -45,7 +45,7 @@ constexpr window default_window_manager = win32;
 
 #else
 
-constexpr renderer default_renderer     = openGL;
+constexpr renderer default_renderer     = openGl;
 constexpr window default_window_manager = glfw;
 
 #endif
@@ -90,7 +90,7 @@ struct Scene {
 
 struct Render {
   struct Graphics {
-    backends::renderer backend {backends::directx12};
+    backends::renderer backend {backends::default_renderer};
     u8 max_framerate = 0;
     bool vsync       = true;
     u8 buffer_count  = 3;

@@ -20,13 +20,15 @@
 #include "GLFW/glfw3.h"
 #include "GLFW/glfw3native.h"
 
+#include "utils.hpp"
+
 
 namespace reveal3d::window {
 
 
 class Glfw {
 public:
-  explicit Glfw(Info const& info);
+  explicit Glfw(Descriptor const& info);
 
   template<graphics::HRI Gfx>
   void create(render::Renderer<Gfx>& renderer);
@@ -43,7 +45,7 @@ private:
   template<graphics::HRI Gfx>
   void clipMouse(render::Renderer<Gfx>& renderer);
 
-  Info info_;
+  Descriptor info_;
   GLFWwindow* window_pointer_;
 };
 
@@ -60,26 +62,12 @@ void Glfw::create(render::Renderer<Gfx>& renderer) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef WIN32
-  window_pointer_ = glfwCreateWindow(1920, 1080, "CraftGL", NULL, NULL);
-  if (!window_pointer_) {
-    logger(LogError) << "Create window error\n";
-  }
-  info_.handle.hwnd = glfwGetWin32Window(window_pointer_);
-
-  if (info_.handle.hwnd == nullptr) {
+  if (not glfw::create_window(info_)) {
     glfwTerminate();
+    logger(LogError) << "Error creating GLFW window, app will terminate.";
     std::terminate();
   }
 
-#else
-  window_pointer_ = glfwCreateWindow(1920, 1080, "CraftGL", NULL, NULL);
-  info_.handle    = window_pointer_;
-  if (!info_.handle) {
-    glfwTerminate();
-    std::terminate();
-  }
-#endif
   glfwSwapInterval(0);
 }
 

@@ -28,10 +28,10 @@ class RenderLayers {
 public:
   void init();
   void addMesh(render::SubMesh& mesh);
-  void draw(std::vector<RenderElement>& render_elments, math::mat4& pass_constants, u32 layer);
+  void draw(std::vector<RenderElement>& render_elements, math::mat4& pass_constants, u32 layer);
 
-  Layer& operator[](u32 index) { return layers_[index]; }
-  Layer const& operator[](u32 index) const { return layers_[index]; }
+  Layer& operator[](u32 const index) { return layers_[index]; }
+  Layer const& operator[](u32 const index) const { return layers_[index]; }
 
 private:
   static std::string readShader(char const* file_name);

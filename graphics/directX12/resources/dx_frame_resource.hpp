@@ -25,12 +25,12 @@ struct FrameResource {
   void update(core::Scene& scene, render::Camera const& camera) {
     auto& geometries = scene.pool<core::Geometry>();
 
-    auto const view_proj = transpose(camera.getViewProjectionMatrix());
+    auto const view_proj = -camera.viewProj();
     pass_buffer.at(0)    = {
-         .view          = camera.getViewMatrix(),
-         .inv_view      = inverse(camera.getViewMatrix()),
-         .proj          = camera.getProjectionMatrix(),
-         .inv_proj      = inverse(camera.getProjectionMatrix()),
+         .view          = camera.view(),
+         .inv_view      = inverse(camera.view()),
+         .proj          = camera.projection(),
+         .inv_proj      = inverse(camera.projection()),
          .view_proj     = view_proj,
          .inv_view_proj = inverse(view_proj),
          .eye_pos       = camera.position(),

@@ -75,7 +75,7 @@ void OpenGL::loadAsset() {
 }
 
 void OpenGL::update(core::Scene& scene, render::Camera const& camera) {
-  pass_constant_ = camera.getViewProjectionMatrix();
+  pass_constant_ = camera.viewProj();
 
   //    auto &transforms = core::scene.Transforms();
   //

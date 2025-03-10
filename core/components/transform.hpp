@@ -71,9 +71,9 @@ public:
 
   void worldPosition(math::vec3 const new_position) const {
     auto& [position, rotation, scale] = pool().posRotScale(id_);
-    pool().world(id_)                 = transpose(affine_transformation(new_position, scale, rotation));
+    pool().world(id_)                 = affine_transformation(new_position, scale, rotation);
     if (auto const parent = entity().parent(); parent.isAlive()) {
-      position = math::vec3 {transpose(parent.component<Transform>().invWorld()) * math::vec4 {new_position}};
+      position = math::vec3 {parent.component<Transform>().invWorld() * math::vec4 {new_position}};
     }
     else {
       position = new_position;
@@ -85,7 +85,7 @@ public:
 
   void worldScale(math::vec3 const new_scale) const {
     auto& [position, rotation, scale] = pool().posRotScale(id_);
-    pool().world(id_)                 = transpose(affine_transformation(position, new_scale, rotation));
+    pool().world(id_)                 = affine_transformation(position, new_scale, rotation);
     if (Entity const parent = entity().parent(); parent.isAlive()) {
       scale = math::vec3 {parent.component<Transform>().invWorld() * math::vec4 {new_scale}};
     }
@@ -100,7 +100,7 @@ public:
     auto& [position, rotation, scale] = pool().posRotScale(id_);
 
     auto const rad = vec_to_radians(new_rot);
-    world()        = transpose(affine_transformation(position, scale, rad));
+    world()        = affine_transformation(position, scale, rad);
     if (Entity const parent = entity().parent(); parent.isAlive()) {
       rotation = math::vec3 {parent.component<Transform>().invWorld() * math::vec4 {rad}};
     }
@@ -127,7 +127,7 @@ public:
     else {
       world() = calcWorld(id_);
     }
-    invWorld() = transpose(inverse(world()));
+    invWorld() = inverse(world());
     --pool().dirties().at(id::index(id_));
   }
 
@@ -156,7 +156,7 @@ public:
 private:
   [[nodiscard]] auto calcWorld(id_t const id) const -> math::mat4 {
     auto& [position, rotation, scale] = scene_->pool<Transform>().posRotScale(id);
-    return transpose(affine_transformation(position, scale, rotation));
+    return affine_transformation(position, scale, rotation);
   };
 
   void softDirty() const {

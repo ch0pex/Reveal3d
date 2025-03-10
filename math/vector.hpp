@@ -93,7 +93,7 @@ struct Vec3 : ScalarOperators {
 };
 
 template<scalar T>
-struct Vec4 : ScalarOperators {
+struct Vec4 : ScalarOperators  {
   constexpr Vec4() : x {}, y {}, z {}, w {} { }
 
   constexpr Vec4(Vec2<T> const xy, T const z, T const w) : x {xy.x}, y {xy.y}, z {z}, w {w} { }

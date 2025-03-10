@@ -19,10 +19,10 @@
 namespace reveal3d::render {
 
 struct Vertex {
-  math::vec3 pos {0.0f, 0.0f, 0.0f};
-  math::vec4 color {0.4f, 0.4f, 0.4f, 0.0f};
-  math::vec3 normal {0.0f, 0.0f, 0.0f};
-  math::vec2 uv {0.0f, 0.0f};
+  math::vec3 pos {0.0F, 0.0F, 0.0f};
+  math::vec4 color {0.4F, 0.4F, 0.4F, 0.0f};
+  math::vec3 normal {0.0F, 0.0F, 0.0f};
+  math::vec2 uv {0.0F, 0.0f};
 };
 
 } // namespace reveal3d::render

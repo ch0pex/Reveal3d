@@ -216,39 +216,21 @@ Mat4x4<T> perspective_fov(T const fov, T const aspect_ratio, T const near_plane,
     return Mat4x4<T>{
         {1 / (aspect_ratio * tanHalfFov), 0, 0, 0},
         {0, 1 / tanHalfFov, 0, 0},
-        {0, 0, (far_plane + near_plane) / (far_plane - near_plane), 1},   // <- LH usa 1 en vez de -1
-        {0, 0, (2 * far_plane * near_plane) / (far_plane - near_plane), 0}
+        {0, 0, (far_plane + near_plane) / (far_plane - near_plane), (2 * far_plane * near_plane) / (far_plane - near_plane)},
+        {0, 0, 1, 0}
     };
 }
 
 template<scalar T>
 Mat4x4<T> look_at(Vec3<T> const position, Vec3<T> const front, Vec3<T> const right, Vec3<T> const up) {
 
-    return Mat4x4<T>{
-        {right.x,  up.x, front.x,0},
-        {right.y,  up.y, front.y,0},
-        {right.z,  up.z, front.z,0},
-        {-dot(right, position), -dot(up, position), -dot(front, position), 1}
-    };
+return Mat4x4<T>{
+    {right.x, right.y, right.z, -dot(right, position)},
+    {up.x, up.y, up.z, -dot(up, position)},
+    {front.x, front.y, front.z, -dot(front, position)},
+    {0, 0, 0, 1}
+};
 }
-
-template<scalar T>
-Mat4x4<T> look_at(Vec3<T> const position, Vec3<T> const target) {
-    Vec3<T> forward = normalize(target - position);
-
-    Vec3<T> right = normalize(cross({0.0F, 0.0F, 1.0F}, forward));
-
-    Vec3<T> new_up = cross(forward, right);
-
-    // Matriz de vista en sistema LH con Z como "up"
-    return Mat4x4<T>{
-            {right.x,    forward.x,   new_up.x,    0},
-            {right.y,    forward.y,   new_up.y,    0},
-            {right.z,    forward.z,   new_up.z,    0},
-            {-dot(right, position), -dot(forward, position), -dot(new_up, position), 1}
-    };
-}
-
 
 template<scalar T>
 constexpr T length(Vec2<T> const& v) {

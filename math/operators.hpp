@@ -91,23 +91,23 @@ constexpr auto operator/(scalar auto const lh, algebra_type auto rh) { rh /= lh;
 
 template<scalar T>
 constexpr auto operator*(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
-   return {mat3.x * vec3, mat3.y * vec3, mat3.z * vec3};
+   return Vec3<T>{dot(mat3.x, vec3), dot(mat3.y , vec3), dot(mat3.z , vec3)};
 }
 
-template<scalar T>
-constexpr auto operator/(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
-   return {dot(mat3.x, vec3), dot(mat3.y, vec3), dot(mat3.z, vec3)};
-}
+// template<scalar T>
+// constexpr auto operator/(Mat3x3<T> const& mat3, Vec3<T> const vec3) -> Vec3<T> {
+   // return Vec3<T>{dot(mat3.x, vec3), dot(mat3.y, vec3), dot(mat3.z, vec3)};
+// }
 
 template<scalar T>
 constexpr auto operator*(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
-   return {dot(mat4.x, vec4), dot(mat4.y, vec4), dot(mat4.z, vec4), dot(mat4.w, vec4)};
+   return Vec4<T>{dot(mat4.x, vec4), dot(mat4.y, vec4), dot(mat4.z, vec4), dot(mat4.w, vec4)};
 }
 
-template<scalar T>
-constexpr auto operator/(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
-   return {mat4.x / vec4, mat4.y / vec4, mat4.z / vec4, mat4.w / vec4};
-}
+// template<scalar T>
+// constexpr auto operator/(Mat4x4<T> const& mat4, Vec4<T> const vec4) -> Vec4<T> {
+   // return Vec4<T>{mat4.x / vec4, mat4.y / vec4, mat4.z / vec4, mat4.w / vec4};
+// }
 
 // clang-format on
 

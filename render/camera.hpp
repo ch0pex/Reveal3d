@@ -54,7 +54,12 @@ public:
 
   [[nodiscard]] math::mat4 view() const { return view_matrix_; }
 
-  [[nodiscard]] math::vec3 position() const { return {position_.x, position_.y, position_.z}; }
+  [[nodiscard]] math::vec3 position() const { return position_; }
+
+  void position(math::vec3 const position) {
+    position_ = position;
+    updateProjection();
+  }
 
   [[nodiscard]] f32 fov() const { return config_.fov; }
 

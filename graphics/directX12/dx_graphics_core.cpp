@@ -55,7 +55,7 @@ void Dx12::update(core::Scene& scene, render::Camera const& camera) {
   heaps_.cleanDeferreds();
 
   // Updates all resources for current frame
-  frame_resources_.at(Commands::frameIndex()).update(scene, camera);
+  update_constants_buffers(frame_resources_.at(Commands::frameIndex()), scene, camera);
 
   // Load new meshes to gpu
   loadAssets(scene);

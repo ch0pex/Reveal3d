@@ -32,14 +32,27 @@ public:
 
   template<graphics::HRI Gfx>
   void create(render::Renderer<Gfx>& renderer);
+
   void show();
+
   template<graphics::HRI Gfx>
   void update(render::Renderer<Gfx>& renderer);
+
   void closeWindow(input::Action act, input::type type);
+
   bool shouldClose();
 
   [[nodiscard]] Resolution getRes() const { return info_.res; }
+
   [[nodiscard]] WHandle getHandle() const { return info_.handle; }
+
+  [[nodiscard]] auto getWindowPtr() const {
+#ifdef WIN32
+    return info_.handle.hwnd;
+#else
+    return info_.handle;
+#endif
+  }
 
 private:
   template<graphics::HRI Gfx>

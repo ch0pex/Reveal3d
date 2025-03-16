@@ -183,31 +183,37 @@ constexpr auto vec_to_degrees(Vec4<T> vec4) -> Vec4<T> {
 
 template<scalar T>
 Mat4x4<T> affine_transformation(Vec3<T> const position, Vec3<T> const scale, Vec3<T> const rotation) {
-    // Matriz de escala
     Mat4x4<T> scaleMat{
-        {scale.x, 0, 0, 0},
-        {0, scale.y, 0, 0},
-        {0, 0, scale.z, 0},
-        {0, 0, 0, 1}
+            {scale.x, 0, 0, 0},
+            {0, scale.y, 0, 0},
+            {0, 0, scale.z, 0},
+            {0, 0, 0, 1}
     };
+
+    T cx = std::cosf(rotation.x);
+    T sx = std::sinf(rotation.x);
+    T cy = std::cosf(rotation.y);
+    T sy = std::sinf(rotation.y);
+    T cz = std::cosf(rotation.z);
+    T sz = std::sinf(rotation.z);
 
     Mat4x4<T> rotationMat{
-        {1, 0, 0, 0},
-        {0, 1, 0, 0},
-        {0, 0, 1, 0},
-        {0, 0, 0, 1}
+            {cy * cz, -cy * sz, sy, 0},
+            {sx * sy * cz + cx * sz, -sx * sy * sz + cx * cz, -sx * cy, 0},
+            {-cx * sy * cz + sx * sz, cx * sy * sz + sx * cz, cx * cy, 0},
+            {0, 0, 0, 1}
     };
 
-    // Traslación
     Mat4x4<T> translationMat{
-        {1, 0, 0, position.x},
-        {0, 1, 0, position.y},
-        {0, 0, 1, position.z},
-        {0, 0, 0, 1}
+            {1, 0, 0, position.x},
+            {0, 1, 0, position.y},
+            {0, 0, 1, position.z},
+            {0, 0, 0, 1}
     };
 
     return translationMat * rotationMat * scaleMat;
 }
+
 
 template<std::floating_point T>
 Mat4x4<T> perspective_fov(T const fov, T const aspect_ratio, T const near_plane, T const far_plane) {
@@ -259,11 +265,7 @@ constexpr auto scale(Mat4x4<T> mat) -> Vec3<T> {
 
 template<scalar T>
 constexpr auto rotation(Mat4x4<T> mat) -> Vec3<T> {
-    // Asumimos que la matriz de rotación está en la parte superior 3x3
     Mat3x3<T> rotMat{Vec3<T>{mat.x}, Vec3<T>{mat.y}, Vec3<T>{mat.z}};
-
-    // Aquí puedes usar algún algoritmo para extraer los ángulos de rotación de la matriz
-    // Esto es solo un ejemplo, puedes utilizar una librería especializada para esto
     T pitch = std::atan2(rotMat.z.y, rotMat.z.z);
     T yaw = std::atan2(-rotMat.z.x, std::sqrt(rotMat.z.y * rotMat.z.y + rotMat.z.z * rotMat.z.z));
     T roll = std::atan2(rotMat.y.x, rotMat.x.x);

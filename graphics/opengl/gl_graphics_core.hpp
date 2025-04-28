@@ -54,8 +54,8 @@ private:
 
   void terminateContext() const;
 
-  math::mat4 pass_constant_;
-  std::vector<opengl::RenderElement> render_elements_;
+  math::mat4 pass_constant_ {};
+  std::vector<opengl::RenderElement> render_elements_ {};
   opengl::RenderLayers render_layers_;
   WHandle window_ {};
 };
